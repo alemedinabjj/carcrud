@@ -1,58 +1,36 @@
-import React from 'react';
-import logo from './logo.svg';
-import { Counter } from './features/counter/Counter';
-import './App.css';
+import { Typography } from "@mui/material";
+import { ThemeProvider, Box } from "@mui/system";
+import { Header } from "./components/Header";
+import { Layout } from "./components/Layout";
+import { appTheme } from "./config/theme";
+import { Routes, Route, Link } from "react-router-dom";
+import { EditCategory } from "./features/categories/EditCategory";
+import { ListCategory } from "./features/categories/ListCategory";
+import { CreateCategory } from "./features/categories/CreateCategory";
 
-function App() {
+export default function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <Counter />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <span>
-          <span>Learn </span>
-          <a
-            className="App-link"
-            href="https://reactjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux-toolkit.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux Toolkit
-          </a>
-          ,<span> and </span>
-          <a
-            className="App-link"
-            href="https://react-redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React Redux
-          </a>
-        </span>
-      </header>
-    </div>
+    <ThemeProvider theme={appTheme}>
+      <Box
+        component="main"
+        sx={{
+          height: "100vh",
+          backgroundColor: (theme) => theme.palette.grey[900],
+          color: (theme) => theme.palette.common.white,
+        }}
+      >
+        <Header />
+        <Layout>
+          <Routes>
+            <Route path="/" element={<ListCategory />} />
+            <Route path="/categories" element={<ListCategory />} />
+            <Route path="/categories/create" element={<CreateCategory />} />
+            <Route path="/categories/edit/:id" element={<EditCategory />} />
+
+            <Route path="*" element={<Typography>Not Found</Typography>} />
+          </Routes>
+        </Layout>
+      </Box>
+    </ThemeProvider>
   );
 }
-
-export default App;
