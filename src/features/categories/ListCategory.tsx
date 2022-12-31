@@ -1,7 +1,7 @@
 import { Box, Button, IconButton, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import { useAppSelector } from "../../app/hooks";
-import { selectCategories } from "./categorySlice";
+import { selectCategories, useGetCategoriesQuery } from "./categorySlice";
 import {
   DataGrid,
   GridColDef,
@@ -13,10 +13,17 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useAppDispatch } from "../../app/hooks";
 import { deleteCategory } from "./categorySlice";
+import { useSnackbar } from "notistack";
 
 export const ListCategory = () => {
+  const { data, isFetching, error } = useGetCategoriesQuery();
+
+  console.log(data, isFetching, error);
+
   const categories = useAppSelector(selectCategories);
   const dispatch = useAppDispatch();
+
+  const { enqueueSnackbar } = useSnackbar();
 
   const componentProps = {
     toolbar: {
@@ -27,13 +34,15 @@ export const ListCategory = () => {
     },
   };
 
-  const rows: GridRowsProp = categories.map((category) => ({
-    id: category.id,
-    name: category.name,
-    description: category.description,
-    is_active: category.is_active,
-    createdAt: category.created_at.replaceAll("-", "/"),
-  }));
+  const rows: GridRowsProp = data
+    ? data.map((car) => ({
+        id: car.id,
+        name: car.name,
+        description: car.description,
+        is_active: car.is_active,
+        createdAt: car.created_at.replaceAll("-", "/"),
+      }))
+    : [];
 
   const columns: GridColDef[] = [
     {
@@ -77,16 +86,19 @@ export const ListCategory = () => {
 
   async function handleDelete(id: string) {
     dispatch(deleteCategory(id));
+    enqueueSnackbar("Category deleted successfully", { variant: "success" });
   }
 
   function renderActionCell(params: GridCellParams) {
+    const { id } = params;
+
     return (
       <IconButton
         color="secondary"
-        onClick={() => console.log("clicou")}
+        onClick={() => handleDelete(id as string)}
         aria-label="delete"
       >
-        <DeleteIcon onClick={() => handleDelete(params.id as string)} />
+        <DeleteIcon />
       </IconButton>
     );
   }
