@@ -11,9 +11,12 @@ import {
   GridRenderCellParams,
 } from "@mui/x-data-grid";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useAppDispatch } from "../../app/hooks";
+import { deleteCategory } from "./categorySlice";
 
 export const ListCategory = () => {
   const categories = useAppSelector(selectCategories);
+  const dispatch = useAppDispatch();
 
   const componentProps = {
     toolbar: {
@@ -72,6 +75,10 @@ export const ListCategory = () => {
     );
   }
 
+  async function handleDelete(id: string) {
+    dispatch(deleteCategory(id));
+  }
+
   function renderActionCell(params: GridCellParams) {
     return (
       <IconButton
@@ -79,7 +86,7 @@ export const ListCategory = () => {
         onClick={() => console.log("clicou")}
         aria-label="delete"
       >
-        <DeleteIcon />
+        <DeleteIcon onClick={() => handleDelete(params.id as string)} />
       </IconButton>
     );
   }
