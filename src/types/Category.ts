@@ -1,5 +1,5 @@
 export interface Results {
-  map(arg0: (car: any) => { id: any; name: any; description: any; is_active: any; createdAt: any; }): readonly import("@mui/x-data-grid").GridValidRowModel[];
+  map(arg0: (category: { id: any; name: any; is_active: any; created_at: string; }) => { id: any; name: any; isActive: any; createdAt: string; }): readonly import("@mui/x-data-grid").GridValidRowModel[];
   meta: Meta;
   links: Links;
   data: Category[];

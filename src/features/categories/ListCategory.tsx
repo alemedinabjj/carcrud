@@ -1,22 +1,27 @@
+import DeleteIcon from "@mui/icons-material/Delete";
 import { Box, Button, IconButton, Typography } from "@mui/material";
-import { Link } from "react-router-dom";
-import { useAppSelector } from "../../app/hooks";
-import { selectCategories, useGetCategoriesQuery } from "./categorySlice";
 import {
   DataGrid,
-  GridColDef,
-  GridRowsProp,
   GridCellParams,
+  GridColDef,
+  GridFilterModel,
+  GridRowsProp,
   GridToolbar,
-  GridRenderCellParams,
 } from "@mui/x-data-grid";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { useAppDispatch } from "../../app/hooks";
-import { deleteCategory } from "./categorySlice";
 import { useSnackbar } from "notistack";
+import { Link } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import {
+  selectCategories,
+  useDeleteCategoryMutation,
+  useGetCategoriesQuery,
+} from "./categorySlice";
+import { CategoryTable } from "./components/CategoryTable";
 
 export const ListCategory = () => {
   const { data, isFetching, error } = useGetCategoriesQuery();
+
+  const [deleteCategory, deleteCategoryStatus] = useDeleteCategoryMutation();
 
   console.log(data, isFetching, error);
 
@@ -25,90 +30,9 @@ export const ListCategory = () => {
 
   const { enqueueSnackbar } = useSnackbar();
 
-  const componentProps = {
-    toolbar: {
-      showQuickFilter: true,
-      quickFilterProps: {
-        debounceMs: 500,
-      },
-    },
-  };
-
-  const rows: GridRowsProp = data
-    ? data.map((car) => ({
-        id: car.id,
-        name: car.name,
-        description: car.description,
-        is_active: car.is_active,
-        createdAt: car.created_at.replaceAll("-", "/"),
-      }))
-    : [];
-
-  const columns: GridColDef[] = [
-    {
-      field: "name",
-      headerName: "Name",
-      width: 150,
-      flex: 1,
-      renderCell: renderNameCell,
-    },
-    {
-      field: "is_active",
-      headerName: "Is Active",
-      flex: 1,
-      type: "boolean",
-      renderCell: renderIsActiveCell,
-    },
-    {
-      field: "createdAt",
-      headerName: "Created At",
-      flex: 1,
-      type: "dateTime",
-    },
-    {
-      field: "id",
-      headerName: "Action",
-      flex: 1,
-      renderCell: renderActionCell,
-    },
-  ];
-
-  function renderNameCell(params: GridCellParams) {
-    return (
-      <Link
-        style={{ textDecoration: "none", color: "inherit" }}
-        to={`/categories/edit/${params.id}`}
-      >
-        <Typography color="primary">{params.value}</Typography>
-      </Link>
-    );
-  }
-
   async function handleDelete(id: string) {
-    dispatch(deleteCategory(id));
+    await deleteCategory({ id });
     enqueueSnackbar("Category deleted successfully", { variant: "success" });
-  }
-
-  function renderActionCell(params: GridCellParams) {
-    const { id } = params;
-
-    return (
-      <IconButton
-        color="secondary"
-        onClick={() => handleDelete(id as string)}
-        aria-label="delete"
-      >
-        <DeleteIcon />
-      </IconButton>
-    );
-  }
-
-  function renderIsActiveCell(params: GridCellParams) {
-    return (
-      <Typography color={params.value ? "primary" : "secondary"}>
-        {params.value ? "Yes" : "No"}{" "}
-      </Typography>
-    );
   }
 
   return (
@@ -125,19 +49,21 @@ export const ListCategory = () => {
         </Button>
       </Box>
 
-      <Box sx={{ display: "flex", height: 600 }}>
-        <DataGrid
-          rowsPerPageOptions={[2, 20, 50, 100]}
-          rows={rows}
-          columns={columns}
-          disableColumnSelector
-          disableColumnFilter
-          disableDensitySelector
-          disableSelectionOnClick
-          components={{ Toolbar: GridToolbar }}
-          componentsProps={componentProps}
-        />
-      </Box>
+      <CategoryTable
+        data={data}
+        isFetching={isFetching}
+        onDelete={handleDelete}
+        perPage={0}
+        onPageChange={function (page: number): void {
+          throw new Error("Function not implemented.");
+        }}
+        onFilterChange={function (filter: GridFilterModel): void {
+          throw new Error("Function not implemented.");
+        }}
+        onPageSizeChange={function (perPage: number): void {
+          throw new Error("Function not implemented.");
+        }}
+      />
     </Box>
   );
 };
